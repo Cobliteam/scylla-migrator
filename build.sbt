@@ -1,4 +1,5 @@
 import sbt.librarymanagement.InclExclRule
+import sbtassembly.AssemblyKeys.assemblyShadeRules
 
 lazy val root = (project in file(".")).settings(
   inThisBuild(
@@ -20,9 +21,9 @@ lazy val root = (project in file(".")).settings(
   fork                      := true,
   scalafmtOnCompile         := true,
   libraryDependencies ++= Seq(
-    "org.apache.spark" %% "spark-streaming"      % "2.4.4" % "provided",
-    "org.apache.spark" %% "spark-sql"            % "2.4.4" % "provided",
-    "org.apache.spark" %% "spark-sql"            % "2.4.4" % "provided",
+    "org.apache.spark" %% "spark-streaming"      % "2.4.5" % "provided",
+    "org.apache.spark" %% "spark-sql"            % "2.4.5" % "provided",
+    "org.apache.spark" %% "spark-sql"            % "2.4.5" % "provided",
     "com.amazonaws"    % "aws-java-sdk-sts"      % "1.11.728",
     "com.amazonaws"    % "aws-java-sdk-dynamodb" % "1.11.728",
     ("com.amazonaws" % "dynamodb-streams-kinesis-adapter" % "1.5.2")
@@ -34,7 +35,9 @@ lazy val root = (project in file(".")).settings(
     "org.scalacheck" %% "scalacheck"    % "1.13.4" % "test"
   ),
   assemblyShadeRules in assembly := Seq(
-    ShadeRule.rename("org.yaml.snakeyaml.**" -> "com.scylladb.shaded.@1").inAll
+    ShadeRule.rename("org.yaml.snakeyaml.**" -> "com.scylladb.shaded.@1").inAll,
+    ShadeRule.rename("com.typesafe.config.**" -> "shadedSparkConfigForSpark.@1").inAll,
+    ShadeRule.rename("com.typesafe.scalalogging.**" -> "shadedScalaLoggingForSpark.@1").inAll
   ),
   assemblyMergeStrategy in assembly := {
     case PathList("org", "joda", "time", _ @_*)                       => MergeStrategy.first
